@@ -39,6 +39,7 @@ class Restaurant(models.Model):
     opening_time = models.TimeField()
     closing_time = models.TimeField()
     image_path = models.ImageField(null=True, blank=True)
+    owner = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, null=True)
 
 class Menu(models.Model):
     class FoodCategory(models.TextChoices):

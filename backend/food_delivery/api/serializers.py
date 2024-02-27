@@ -80,14 +80,17 @@ class LoginSerializer(serializers.Serializer):
         }      
 
 class RestaurantSerializer(serializers.ModelSerializer):
+    owner = CustomUserSerializer(read_only=True)
+    owner_id = serializers.PrimaryKeyRelatedField(write_only=True, queryset=CustomUser.objects.all(), source="owner")
     class Meta:
         model = Restaurant
-        fields = ["id", "name", "address", "phone_number", "email", "rating", "delivery_radius", "opening_time", "closing_time", "image_path"]
+        fields = ["id", "name", "address", "phone_number", "email", "rating", "delivery_radius", "opening_time", "closing_time", "image_path", "owner_id", "owner"]
 
 class MenuSerializer(serializers.ModelSerializer):
+    restaurant_id = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Restaurant.objects.all(), source="restaurant")
     class Meta:
         model = Menu
-        fields = ["id", "name", "description", "price", "category", "image_path", "restaurant"]
+        fields = ["id", "name", "description", "price", "category", "image_path", "restaurant_id"]
         
 class OrderSerializer(serializers.ModelSerializer):
     customer = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.filter(role=CustomUser.Role.CUSTOMER))
