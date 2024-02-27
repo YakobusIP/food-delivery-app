@@ -1,9 +1,9 @@
-from typing import Any, Dict
+from typing import Dict
 from rest_framework import serializers
-from rest_framework_simplejwt.tokens import Token, RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model, authenticate
 from django.core.exceptions import ValidationError
-from .models import CustomUser, CustomerProfile, DeliveryProfile, Restaurant, Menu, Order, OrderItem
+from ..models import CustomUser, CustomerProfile, DeliveryProfile
 
 User = get_user_model()
 
@@ -26,22 +26,16 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = { "password": { "write_only": True } }
 
     def create(self, validated_data):
+        # Extract profile related ada
         role = validated_data.pop("role")
-        address = validated_data.pop("address", None)
-        image_path = validated_data.pop("image_path", None)
+        profile_data = { k: validated_data.pop(k, None) for k in ["address", "image_path"] if k in validated_data }
 
+        # Create the new user based on the role
         user = CustomUser.objects.create_user(**validated_data, role=role)
 
-        if role == CustomUser.Role.CUSTOMER:
-            customer_profile_data = {}
-
-            if address:
-                customer_profile_data["address"] = address
-            if image_path:
-                customer_profile_data["image_path"] = image_path
-
-            CustomerProfile.objects.create(user=user, **customer_profile_data)
-
+        # Create profile based on role
+        if role == CustomUser.Role.CUSTOMER and any(profile_data.values()):
+            CustomerProfile.objects.create(user=user, **profile_data)
         if role == CustomUser.Role.DELIVERY:
             DeliveryProfile.objects.create(user=user)
 
@@ -77,27 +71,4 @@ class LoginSerializer(serializers.Serializer):
         return {
             "user": user_data,
             "tokens": tokens
-        }      
-
-class RestaurantSerializer(serializers.ModelSerializer):
-    owner = CustomUserSerializer(read_only=True)
-    owner_id = serializers.PrimaryKeyRelatedField(write_only=True, queryset=CustomUser.objects.all(), source="owner")
-    class Meta:
-        model = Restaurant
-        fields = ["id", "name", "address", "phone_number", "email", "rating", "delivery_radius", "opening_time", "closing_time", "image_path", "owner_id", "owner"]
-
-class MenuSerializer(serializers.ModelSerializer):
-    restaurant_id = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Restaurant.objects.all(), source="restaurant")
-    class Meta:
-        model = Menu
-        fields = ["id", "name", "description", "price", "category", "image_path", "restaurant_id"]
-        
-class OrderSerializer(serializers.ModelSerializer):
-    customer = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.filter(role=CustomUser.Role.CUSTOMER))
-    delivery_person = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.filter(role=CustomUser.Role.DELIVERY), allow_null=True)
-    restaurant = RestaurantSerializer(read_only=True)
-    restaurant_id = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Restaurant.objects.all(), source="restaurant")
-
-    class Meta:
-        model = Order
-        fields = ["id", "customer", "delivery_person", "restaurant", "restaurant_id", "status", "total_price", "order_time", "delivery_time"]
+        }  

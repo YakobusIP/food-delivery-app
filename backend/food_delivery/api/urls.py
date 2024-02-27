@@ -1,9 +1,11 @@
 from django.urls import path
-from .views import UserCreateAPIView, LoginAPIView, RestaurantAPIView, RestaurantDetailAPIView, MenuAPIView, MenuListAPIView
+from .views.auth_views import RegisterAPIView, LoginAPIView
+from .views.restaurant_views import RestaurantAPIView, RestaurantDetailAPIView 
+from .views.menu_views import MenuAPIView, MenuListAPIView
 
 urlpatterns = [
     # Auth Path
-    path("auth/register/", UserCreateAPIView.as_view(), name="auth_register"),
+    path("auth/register/", RegisterAPIView.as_view(), name="auth_register"),
     path("auth/login/", LoginAPIView.as_view(), name="auth_login"),
 
     # Restaurant Path
@@ -13,4 +15,9 @@ urlpatterns = [
     # Menu Path
     path("restaurants/<int:restaurant_id>/menus", MenuAPIView.as_view(), name="menu_get_add"),
     path("restaurants/<int:restaurant_id>/menus/<int:menu_id>", MenuListAPIView.as_view(), name="menu_detail_get_put_delete")
+
+    # Order Path
+    # path("orders/customers")
+    # path("orders/restaurants")
+    # path("orders/deliveries")
 ]
