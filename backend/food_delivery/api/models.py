@@ -63,6 +63,7 @@ class Menu(models.Model):
 
 class Order(models.Model):
     class OrderStatus(models.TextChoices):
+        PENDING = "PENDING", "Pending"
         PLACED = "PLACED", "Order Placed" 
         IN_KITCHEN = "IN_KITCHEN", "In Kitchen" 
         OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY", "Out for Delivery" 
@@ -71,7 +72,7 @@ class Order(models.Model):
     customer = models.ForeignKey(CustomUser, related_name="orders_placed", on_delete=models.CASCADE)
     delivery_person = models.ForeignKey(CustomUser, null=True, related_name="deliveries", on_delete=models.CASCADE)
     restaurant = models.ForeignKey(Restaurant, related_name="placed_orders", on_delete=models.CASCADE)
-    status = models.CharField(max_length=20 ,choices=OrderStatus.choices, default=OrderStatus.PLACED)
+    status = models.CharField(max_length=20 ,choices=OrderStatus.choices, default=OrderStatus.PENDING)
     total_price = models.IntegerField()
     order_time = models.DateTimeField(auto_now_add=True)
     delivery_time = models.DateTimeField(null=True, blank=True)
