@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:food_delivery/models/welcome_slide_model.dart';
 import 'package:food_delivery/pages/register.dart';
+import 'package:food_delivery/pages/login.dart';
 
 class WelcomePage extends StatelessWidget {
   WelcomePage({super.key});
@@ -42,7 +43,12 @@ class WelcomePage extends StatelessWidget {
                 SizedBox(
                   width: 350,
                   child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()));
+                      },
                       style: TextButton.styleFrom(
                           backgroundColor:
                               const Color.fromARGB(255, 4, 202, 138),
