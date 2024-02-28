@@ -11,7 +11,7 @@ class CustomUser(AbstractUser):
 
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=10, choices=Role.choices, default=Role.CUSTOMER)
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=20, unique=True)
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -30,7 +30,7 @@ class DeliveryProfile(models.Model):
 class Restaurant(models.Model):
     name = models.CharField(max_length=100)
     address = models.TextField()
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=20, unique=True)
     email = models.EmailField(unique=True)
     rating = models.FloatField(
         default=5.0, 
