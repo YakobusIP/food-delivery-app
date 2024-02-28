@@ -6,11 +6,11 @@ from .views.order_views import OrderCustomerAPIView, OrderCustomerDetailAPIView
 
 urlpatterns = [
     # Auth Path
-    path("auth/register/", RegisterAPIView.as_view(), name="auth_register"),
-    path("auth/login/", LoginAPIView.as_view(), name="auth_login"),
+    path("auth/register", RegisterAPIView.as_view(), name="auth_register"),
+    path("auth/login", LoginAPIView.as_view(), name="auth_login"),
 
     # Restaurant Path
-    path("restaurants/", RestaurantAPIView.as_view(), name="restaurant_get_create"),
+    path("restaurants", RestaurantAPIView.as_view(), name="restaurant_get_create"),
     path("restaurants/<int:id>", RestaurantDetailAPIView.as_view(), name="restaurant_detail_get_put"),
 
     # Menu Path

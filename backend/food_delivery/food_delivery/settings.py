@@ -27,7 +27,9 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["10.0.2.2"]
+
+APPEND_SLASH = False
 
 
 # Application definition
