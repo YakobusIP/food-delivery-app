@@ -1,8 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:food_delivery/models/register_role_model.dart';
 import 'package:food_delivery/pages/login.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:food_delivery/network/dio_client.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -73,24 +73,22 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      var url = Uri.parse("http://10.0.2.2:8000/api/auth/register");
+      var dioClient = DioClient();
 
       try {
-        var response = await http.post(
-          url,
-          headers: {"Content-Type": "application/json"},
-          body: json.encode({
+        var response = await dioClient.dio.post(
+          "/auth/register",
+          data: {
             "username": _usernameController.text,
             "email": _emailController.text,
             "password": _passwordController.text,
             "role": _selectedRole,
             "phone_number": _phoneNumberController.text,
-          }),
+          },
         );
 
         if (response.statusCode == 201) {
-          var responseData = json.decode(response.body);
-          var message = responseData["message"];
+          var message = response.data["message"];
 
           if (!mounted) return;
           ScaffoldMessenger.of(context)
@@ -98,9 +96,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const LoginPage()));
-        } else if (response.statusCode == 400) {
-          var responseData = json.decode(response.body);
-          var errors = responseData["errors"];
+        }
+      } on DioException catch (e) {
+        if (e.response != null && e.response!.statusCode == 400) {
+          var errors = e.response!.data["errors"];
 
           setState(() {
             _usernameError = errors["username"]?.first;
@@ -111,11 +110,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 ? "A ${errors["phone_number"].first}"
                 : errors["phone_number"]?.first;
           });
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Unknown error")));
         }
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Network error")));
       }
     }
   }
@@ -203,13 +202,18 @@ class _RegisterPageState extends State<RegisterPage> {
     required TextEditingController controller,
     FocusNode? focusNode,
     String? errorText,
+    bool isEmail = false,
     bool isPassword = false,
     bool isPhoneNumber = false,
   }) {
     return TextFormField(
       controller: controller,
       focusNode: focusNode,
-      keyboardType: isPhoneNumber ? TextInputType.number : null,
+      keyboardType: isPhoneNumber
+          ? TextInputType.number
+          : isEmail
+              ? TextInputType.emailAddress
+              : null,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -343,6 +347,7 @@ class _RegisterPageState extends State<RegisterPage> {
         return null;
       },
       errorText: _emailError,
+      isEmail: true,
     );
   }
 
