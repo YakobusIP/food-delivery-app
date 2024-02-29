@@ -1,4 +1,5 @@
 import "package:dio/dio.dart";
+import "package:food_delivery/main.dart";
 import "package:food_delivery/services/storage_service.dart";
 
 class TokenInterceptor extends Interceptor {
@@ -34,6 +35,8 @@ class TokenInterceptor extends Interceptor {
       } else {
         _storageService.delete("accessToken");
         _storageService.delete("refreshtoken");
+
+        navigatorKey.currentState?.pushNamed("/login");
       }
     }
     return super.onError(err, handler);
