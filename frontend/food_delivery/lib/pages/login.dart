@@ -1,6 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:food_delivery/network/dio_client.dart';
+import 'package:food_delivery/services/storage_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,9 +12,76 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  final SecureStorageService _storageService = SecureStorageService();
 
   final TextEditingController _identifierController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      var dioClient = DioClient();
+
+      try {
+        var response = await dioClient.dio.post(
+          "/auth/login",
+          data: {
+            "identifier": _identifierController.text,
+            "password": _passwordController.text,
+          },
+        );
+
+        if (response.statusCode == 200) {
+          await _storageService.set(
+              "username", response.data["data"]["user"]["username"]);
+          await _storageService.set(
+              "role", response.data["data"]["user"]["role"]);
+          await _storageService.set(
+              "accessToken", response.data["data"]["tokens"]["access"]);
+          await _storageService.set(
+              "refreshToken", response.data["data"]["tokens"]["refresh"]);
+
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Login successful"),
+              backgroundColor: Color.fromARGB(255, 4, 202, 138),
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 5),
+            ),
+          );
+
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            "/restaurant-list",
+            (_) => false,
+          );
+        }
+      } on DioException catch (e) {
+        if (e.response != null && e.response!.statusCode == 400) {
+          var errors = e.response!.data["errors"];
+
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errors["non_field_errors"].first),
+              backgroundColor: const Color.fromARGB(255, 255, 130, 2),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Unknown error"),
+              backgroundColor: Color.fromARGB(255, 255, 130, 2),
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                       _passwordField(),
                       const SizedBox(height: 20),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: _submitForm,
                           style: TextButton.styleFrom(
                               minimumSize: const Size.fromHeight(50),
                               backgroundColor:
