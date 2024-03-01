@@ -11,12 +11,12 @@ class CustomUser(AbstractUser):
 
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=10, choices=Role.choices, default=Role.CUSTOMER)
-    phone_number = models.CharField(max_length=20, unique=True)
+    phone_number = models.CharField(max_length=50, unique=True)
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     address = models.TextField(null=True, blank=True)
-    image_path = models.ImageField(null=True, blank=True)
+    image_path = models.URLField(null=True, blank=True)
 
 class DeliveryProfile(models.Model):
     class Availability(models.TextChoices):
@@ -30,7 +30,7 @@ class DeliveryProfile(models.Model):
 class Restaurant(models.Model):
     name = models.CharField(max_length=100)
     address = models.TextField()
-    phone_number = models.CharField(max_length=20, unique=True)
+    phone_number = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
     rating = models.FloatField(
         default=5.0, 
@@ -38,7 +38,7 @@ class Restaurant(models.Model):
     delivery_radius = models.IntegerField(validators=[MinValueValidator(1)])
     opening_time = models.TimeField()
     closing_time = models.TimeField()
-    image_path = models.ImageField(null=True, blank=True)
+    image_path = models.URLField(null=True, blank=True)
     owner = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, null=True)
 
 class Menu(models.Model):
@@ -59,7 +59,7 @@ class Menu(models.Model):
     description = models.TextField(null=True, blank=True)
     price = models.IntegerField()
     category = models.CharField(max_length=20, choices=FoodCategory.choices, null=True, blank=True)
-    image_path = models.ImageField(null=True, blank=True)
+    image_path = models.URLField(null=True, blank=True)
 
 class Order(models.Model):
     class OrderStatus(models.TextChoices):

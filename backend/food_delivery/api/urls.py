@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
 from .views.auth_views import RegisterAPIView, LoginAPIView
 from .views.restaurant_views import RestaurantAPIView, RestaurantDetailAPIView 
 from .views.menu_views import MenuAPIView, MenuListAPIView
@@ -8,6 +9,7 @@ urlpatterns = [
     # Auth Path
     path("auth/register", RegisterAPIView.as_view(), name="auth_register"),
     path("auth/login", LoginAPIView.as_view(), name="auth_login"),
+    path("auth/refresh-token", TokenRefreshView.as_view(), name="auth_refresh"),
 
     # Restaurant Path
     path("restaurants", RestaurantAPIView.as_view(), name="restaurant_get_create"),
