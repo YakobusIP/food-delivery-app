@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:food_delivery/main.dart';
 import 'package:food_delivery/models/register_role_model.dart';
 import 'package:food_delivery/network/dio_client.dart';
 
@@ -31,14 +32,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final FocusNode _usernameFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _phoneNumberFocusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    _usernameController.addListener(_onUsernameChanged);
-    _emailController.addListener(_onEmailChanged);
-    _phoneNumberController.addListener(_onPhoneNumberChanged);
-  }
 
   void _onUsernameChanged() {
     if (_usernameFocusNode.hasFocus) {
@@ -90,12 +83,18 @@ class _RegisterPageState extends State<RegisterPage> {
           var message = response.data["message"];
 
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
+          snackbarKey.currentState?.showSnackBar(
             SnackBar(
               content: Text(message),
               backgroundColor: const Color.fromARGB(255, 4, 202, 138),
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: "Dismiss",
+                onPressed: () {
+                  snackbarKey.currentState?.hideCurrentSnackBar();
+                },
+              ),
             ),
           );
 
@@ -116,17 +115,31 @@ class _RegisterPageState extends State<RegisterPage> {
           });
         } else {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Unknown error"),
-              backgroundColor: Color.fromARGB(255, 255, 130, 2),
+          snackbarKey.currentState?.showSnackBar(
+            SnackBar(
+              content: const Text("Unknown error"),
+              backgroundColor: const Color.fromARGB(255, 255, 130, 2),
               behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 5),
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: "Dismiss",
+                onPressed: () {
+                  snackbarKey.currentState?.hideCurrentSnackBar();
+                },
+              ),
             ),
           );
         }
       }
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _usernameController.addListener(_onUsernameChanged);
+    _emailController.addListener(_onEmailChanged);
+    _phoneNumberController.addListener(_onPhoneNumberChanged);
   }
 
   @override

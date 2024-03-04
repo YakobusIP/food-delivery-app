@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dio/dio.dart';
+import 'package:food_delivery/main.dart';
 import 'package:food_delivery/models/restaurants_model.dart';
 import 'package:food_delivery/network/dio_client.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +20,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final List<String> _sortOptions = ["name", "-name", "rating", "-rating"];
   String _sortedBy = "name";
 
-  List<Restaurants> _restaurants = [];
+  final List<Restaurants> _restaurants = [];
   bool _isLoading = false;
   int _currentPage = 1;
 
@@ -163,12 +164,18 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
       }
     } on DioException catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Unknown error"),
-          backgroundColor: Color.fromARGB(255, 255, 130, 2),
+      snackbarKey.currentState?.showSnackBar(
+        SnackBar(
+          content: const Text("Unknown error"),
+          backgroundColor: const Color.fromARGB(255, 255, 130, 2),
           behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 5),
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: "Dismiss",
+            onPressed: () {
+              snackbarKey.currentState?.hideCurrentSnackBar();
+            },
+          ),
         ),
       );
     }

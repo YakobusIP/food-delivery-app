@@ -1,4 +1,5 @@
 import "package:dio/dio.dart";
+import "package:flutter/material.dart";
 import "package:food_delivery/main.dart";
 import "package:food_delivery/services/storage_service.dart";
 
@@ -20,23 +21,42 @@ class TokenInterceptor extends Interceptor {
   Future<void> onError(
       DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      RequestOptions options = err.response!.requestOptions;
-      var refreshToken = await _storageService.get("refreshToken");
-      var response = await _tokenDio.post(
-        "/auth/refresh-token",
-        data: {"refresh": refreshToken},
-      );
+      try {
+        RequestOptions options = err.response!.requestOptions;
+        var refreshToken = await _storageService.get("refreshToken");
+        var response = await _tokenDio.post(
+          "/auth/refresh-token",
+          data: {"refresh": refreshToken},
+        );
 
-      if (response.statusCode == 200) {
         await _storageService.set("accessToken", response.data["access"]);
         options.headers["Authorization"] = "Bearer ${response.data["access"]}";
         var followUpResponse = await _tokenDio.fetch(options);
         return handler.resolve(followUpResponse);
-      } else {
+      } on DioException {
         _storageService.delete("accessToken");
         _storageService.delete("refreshtoken");
 
-        navigatorKey.currentState?.pushNamed("/login");
+        navigatorKey.currentState?.pushNamedAndRemoveUntil(
+          "/login",
+          (_) => false,
+        );
+
+        snackbarKey.currentState?.showSnackBar(
+          SnackBar(
+            content: const Text("Session expired."),
+            backgroundColor: const Color.fromARGB(255, 255, 130, 2),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: "Dismiss",
+              onPressed: () {
+                snackbarKey.currentState?.hideCurrentSnackBar();
+              },
+              textColor: Colors.white,
+            ),
+          ),
+        );
       }
     }
     return super.onError(err, handler);

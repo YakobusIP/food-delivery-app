@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:food_delivery/main.dart';
 import 'package:food_delivery/network/dio_client.dart';
 import 'package:food_delivery/services/storage_service.dart';
 
@@ -41,12 +42,18 @@ class _LoginPageState extends State<LoginPage> {
               "refreshToken", response.data["data"]["tokens"]["refresh"]);
 
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Login successful"),
-              backgroundColor: Color.fromARGB(255, 4, 202, 138),
+          snackbarKey.currentState?.showSnackBar(
+            SnackBar(
+              content: const Text("Login successful"),
+              backgroundColor: const Color.fromARGB(255, 4, 202, 138),
               behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 5),
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: "Dismiss",
+                onPressed: () {
+                  snackbarKey.currentState?.hideCurrentSnackBar();
+                },
+              ),
             ),
           );
 
@@ -60,22 +67,34 @@ class _LoginPageState extends State<LoginPage> {
           var errors = e.response!.data["errors"];
 
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
+          snackbarKey.currentState?.showSnackBar(
             SnackBar(
               content: Text(errors["non_field_errors"].first),
               backgroundColor: const Color.fromARGB(255, 255, 130, 2),
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: "Dismiss",
+                onPressed: () {
+                  snackbarKey.currentState?.hideCurrentSnackBar();
+                },
+              ),
             ),
           );
         } else {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Unknown error"),
-              backgroundColor: Color.fromARGB(255, 255, 130, 2),
+          snackbarKey.currentState?.showSnackBar(
+            SnackBar(
+              content: const Text("Unknown error"),
+              backgroundColor: const Color.fromARGB(255, 255, 130, 2),
               behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 5),
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: "Dismiss",
+                onPressed: () {
+                  snackbarKey.currentState?.hideCurrentSnackBar();
+                },
+              ),
             ),
           );
         }
