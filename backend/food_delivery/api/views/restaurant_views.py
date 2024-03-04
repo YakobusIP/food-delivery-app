@@ -4,6 +4,7 @@ from rest_framework import status
 from ..models import Restaurant
 from ..serializers.restaurant_serializers import RestaurantSerializer
 from ..permissions import IsAuthenticated, IsAuthenticatedRestaurantRole
+from ..pagination import CustomPagination
 from django.shortcuts import get_object_or_404
 from datetime import datetime
 
@@ -27,8 +28,16 @@ class RestaurantAPIView(APIView):
 
     def get(self, request):
         queryset = self.filter_queryset(Restaurant.objects.all())
+
+        paginator = CustomPagination()
+        page = paginator.paginate_queryset(queryset, request)
+
+        if page is not None:
+            serializer = RestaurantSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        
         serializer = RestaurantSerializer(queryset, many=True)
-        return Response({ "data": serializer.data })
+        return Response({"data": serializer.data})
     
     def post(self, request):
         data = {
