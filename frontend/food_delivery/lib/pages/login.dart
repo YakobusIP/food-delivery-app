@@ -53,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   snackbarKey.currentState?.hideCurrentSnackBar();
                 },
+                textColor: Colors.white,
               ),
             ),
           );
@@ -78,6 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   snackbarKey.currentState?.hideCurrentSnackBar();
                 },
+                textColor: Colors.white,
               ),
             ),
           );
@@ -94,6 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   snackbarKey.currentState?.hideCurrentSnackBar();
                 },
+                textColor: Colors.white,
               ),
             ),
           );

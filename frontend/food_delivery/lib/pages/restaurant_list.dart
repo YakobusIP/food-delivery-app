@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -15,6 +17,10 @@ class RestaurantListPage extends StatefulWidget {
 }
 
 class _RestaurantListPageState extends State<RestaurantListPage> {
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+  String _searchQuery = "";
+
   bool _currentlyOpened = false;
 
   final List<String> _sortOptions = ["name", "-name", "rating", "-rating"];
@@ -25,6 +31,18 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   int _currentPage = 1;
 
   final ScrollController _scrollController = ScrollController();
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(seconds: 1), () {
+      setState(() {
+        _searchQuery = _searchController.text;
+        _currentPage = 1;
+        _restaurants.clear();
+      });
+      _getRestaurants();
+    });
+  }
 
   Future<void> _showFilterBottomSheet() async {
     bool tempCurrentlyOpened = _currentlyOpened;
@@ -114,13 +132,19 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     if (_currentlyOpened != tempCurrentlyOpened) {
       setState(() {
         _currentlyOpened = tempCurrentlyOpened;
+        _currentPage = 1;
+        _restaurants.clear();
       });
+      _getRestaurants();
     }
 
     if (_sortedBy != tempSortedBy) {
       setState(() {
         _sortedBy = tempSortedBy!;
+        _currentPage = 1;
+        _restaurants.clear();
       });
+      _getRestaurants();
     }
   }
 
@@ -151,6 +175,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     try {
       var response = await dioClient.dio.get("/restaurants", queryParameters: {
         "currentPage": _currentPage,
+        "sort": _sortedBy,
+        "time": _currentlyOpened ? _getFormattedCurrentTime() : null,
+        "name": _searchQuery.isNotEmpty ? _searchQuery : null,
       });
 
       var data = response.data["data"] as List;
@@ -175,6 +202,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
             onPressed: () {
               snackbarKey.currentState?.hideCurrentSnackBar();
             },
+            textColor: Colors.white,
           ),
         ),
       );
@@ -184,6 +212,12 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   String _formatTime(String timeString) {
     DateTime time = DateFormat("HH:mm:ss").parse(timeString);
     return DateFormat("HH:mm").format(time);
+  }
+
+  String _getFormattedCurrentTime() {
+    DateTime now = DateTime.now();
+    String formattedTime = DateFormat("HH:mm").format(now);
+    return formattedTime;
   }
 
   @override
@@ -196,11 +230,14 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         _getRestaurants();
       }
     });
+    _searchController.addListener(_onSearchChanged);
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -224,45 +261,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
             child: Column(
               children: [
-                TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: SvgPicture.asset(
-                        width: 10,
-                        height: 10,
-                        "assets/icons/search.svg",
-                        fit: BoxFit.scaleDown,
-                      ),
-                    ),
-                    hintText: "Where do you want to eat?",
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                  ),
-                ),
+                _searchField(),
                 const SizedBox(height: 10),
-                TextButton.icon(
-                  onPressed: _showFilterBottomSheet,
-                  icon: SvgPicture.asset(
-                    "assets/icons/filter.svg",
-                    width: 25,
-                    height: 25,
-                  ),
-                  label: const Text(
-                    "Filter & sort",
-                    style: TextStyle(color: Colors.black, fontSize: 18),
-                  ),
-                  style: TextButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(color: Colors.black),
-                          borderRadius: BorderRadius.circular(10))),
-                ),
+                _filterAndSort(),
               ],
             ),
           ),
@@ -275,68 +276,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                 itemBuilder: (BuildContext context, int index) {
                   final restaurant = _restaurants[index];
                   if (index < _restaurants.length) {
-                    return Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        children: [
-                          Image.network(
-                            restaurant.imagePath,
-                            width: 100,
-                            height: 100,
-                          ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  restaurant.name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 18),
-                                ),
-                                Row(children: [
-                                  SvgPicture.asset(
-                                    "assets/icons/clock.svg",
-                                    width: 18,
-                                    height: 18,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    "${_formatTime(restaurant.openingTime)} - ${_formatTime(restaurant.closingTime)}",
-                                    style: const TextStyle(fontSize: 16),
-                                  )
-                                ]),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    RatingBarIndicator(
-                                      itemBuilder:
-                                          (BuildContext context, int index) =>
-                                              const Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                      ),
-                                      rating: restaurant.rating,
-                                      itemCount: 5,
-                                      direction: Axis.horizontal,
-                                      itemSize: 20,
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      restaurant.rating.toString(),
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    );
+                    return _activeListView(restaurant);
                   } else if (_isLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return _loadingProgress();
                   } else {
                     return Container();
                   }
@@ -346,32 +288,160 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               ),
             ),
           ),
-          BottomNavigationBar(
-            items: [
-              BottomNavigationBarItem(
-                  icon: SvgPicture.asset(
-                    "assets/icons/restaurant.svg",
-                    width: 30,
-                    height: 30,
-                  ),
-                  label: "Restaurants"),
-              BottomNavigationBarItem(
-                  icon: SvgPicture.asset(
-                    "assets/icons/history.svg",
-                    width: 30,
-                    height: 30,
-                  ),
-                  label: "Order History"),
-              BottomNavigationBarItem(
-                  icon: SvgPicture.asset(
-                    "assets/icons/account_circle.svg",
-                    width: 30,
-                    height: 30,
-                  ),
-                  label: "Account"),
-            ],
+          _bottomNavigationBar()
+        ],
+      ),
+    );
+  }
+
+  BottomNavigationBar _bottomNavigationBar() {
+    return BottomNavigationBar(
+      items: [
+        BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              "assets/icons/restaurant.svg",
+              width: 30,
+              height: 30,
+            ),
+            label: "Restaurants"),
+        BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              "assets/icons/history.svg",
+              width: 30,
+              height: 30,
+            ),
+            label: "Order History"),
+        BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              "assets/icons/account_circle.svg",
+              width: 30,
+              height: 30,
+            ),
+            label: "Account"),
+      ],
+    );
+  }
+
+  Center _loadingProgress() => const Center(child: CircularProgressIndicator());
+
+  Container _activeListView(Restaurants restaurant) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        children: [
+          Image.network(
+            restaurant.imagePath,
+            width: 100,
+            height: 100,
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  restaurant.name,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 18),
+                ),
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/icons/clock.svg",
+                      width: 18,
+                      height: 18,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      "${_formatTime(restaurant.openingTime)} - ${_formatTime(restaurant.closingTime)}",
+                      style: const TextStyle(fontSize: 16),
+                    )
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    RatingBarIndicator(
+                      itemBuilder: (BuildContext context, int index) =>
+                          const Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      rating: restaurant.rating,
+                      itemCount: 5,
+                      direction: Axis.horizontal,
+                      itemSize: 20,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      restaurant.rating.toString(),
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                )
+              ],
+            ),
           )
         ],
+      ),
+    );
+  }
+
+  TextButton _filterAndSort() {
+    return TextButton.icon(
+      onPressed: _showFilterBottomSheet,
+      icon: SvgPicture.asset(
+        "assets/icons/filter.svg",
+        width: 25,
+        height: 25,
+      ),
+      label: const Text(
+        "Filter & sort",
+        style: TextStyle(color: Colors.black, fontSize: 18),
+      ),
+      style: TextButton.styleFrom(
+        minimumSize: const Size.fromHeight(50),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: Colors.black),
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  TextField _searchField() {
+    return TextField(
+      controller: _searchController,
+      decoration: InputDecoration(
+        prefixIcon: Padding(
+          padding: const EdgeInsets.all(10),
+          child: SvgPicture.asset(
+            width: 10,
+            height: 10,
+            "assets/icons/search.svg",
+            fit: BoxFit.scaleDown,
+          ),
+        ),
+        suffixIcon: _searchController.text.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: _searchController.clear,
+              )
+            : null,
+        hintText: "Where do you want to eat?",
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(
+            color: Colors.black,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(
+            color: Colors.black,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
       ),
     );
   }

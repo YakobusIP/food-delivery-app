@@ -94,6 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 onPressed: () {
                   snackbarKey.currentState?.hideCurrentSnackBar();
                 },
+                textColor: Colors.white,
               ),
             ),
           );
@@ -126,6 +127,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 onPressed: () {
                   snackbarKey.currentState?.hideCurrentSnackBar();
                 },
+                textColor: Colors.white,
               ),
             ),
           );
