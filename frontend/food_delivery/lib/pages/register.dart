@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:food_delivery/components/snackbars.dart';
 import 'package:food_delivery/main.dart';
 import 'package:food_delivery/models/register_role_model.dart';
 import 'package:food_delivery/network/dio_client.dart';
@@ -84,19 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
           if (!mounted) return;
           snackbarKey.currentState?.showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: const Color.fromARGB(255, 4, 202, 138),
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: "Dismiss",
-                onPressed: () {
-                  snackbarKey.currentState?.hideCurrentSnackBar();
-                },
-                textColor: Colors.white,
-              ),
-            ),
+            showValidSnackbar(message),
           );
 
           Navigator.of(context).pushReplacementNamed("/login");
@@ -117,19 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
         } else {
           if (!mounted) return;
           snackbarKey.currentState?.showSnackBar(
-            SnackBar(
-              content: const Text("Unknown error"),
-              backgroundColor: const Color.fromARGB(255, 255, 130, 2),
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: "Dismiss",
-                onPressed: () {
-                  snackbarKey.currentState?.hideCurrentSnackBar();
-                },
-                textColor: Colors.white,
-              ),
-            ),
+            showInvalidSnackbar("Unknown error"),
           );
         }
       }

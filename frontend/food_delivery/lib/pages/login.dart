@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:food_delivery/components/snackbars.dart';
 import 'package:food_delivery/main.dart';
 import 'package:food_delivery/network/dio_client.dart';
 import 'package:food_delivery/services/storage_service.dart';
@@ -43,19 +44,7 @@ class _LoginPageState extends State<LoginPage> {
 
           if (!mounted) return;
           snackbarKey.currentState?.showSnackBar(
-            SnackBar(
-              content: const Text("Login successful"),
-              backgroundColor: const Color.fromARGB(255, 4, 202, 138),
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: "Dismiss",
-                onPressed: () {
-                  snackbarKey.currentState?.hideCurrentSnackBar();
-                },
-                textColor: Colors.white,
-              ),
-            ),
+            showValidSnackbar("Login successful"),
           );
 
           Navigator.of(context).pushNamedAndRemoveUntil(
@@ -69,36 +58,12 @@ class _LoginPageState extends State<LoginPage> {
 
           if (!mounted) return;
           snackbarKey.currentState?.showSnackBar(
-            SnackBar(
-              content: Text(errors["non_field_errors"].first),
-              backgroundColor: const Color.fromARGB(255, 255, 130, 2),
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: "Dismiss",
-                onPressed: () {
-                  snackbarKey.currentState?.hideCurrentSnackBar();
-                },
-                textColor: Colors.white,
-              ),
-            ),
+            showInvalidSnackbar(errors["non_field_errors"].first),
           );
         } else {
           if (!mounted) return;
           snackbarKey.currentState?.showSnackBar(
-            SnackBar(
-              content: const Text("Unknown error"),
-              backgroundColor: const Color.fromARGB(255, 255, 130, 2),
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: "Dismiss",
-                onPressed: () {
-                  snackbarKey.currentState?.hideCurrentSnackBar();
-                },
-                textColor: Colors.white,
-              ),
-            ),
+            showInvalidSnackbar("Unknown error"),
           );
         }
       }

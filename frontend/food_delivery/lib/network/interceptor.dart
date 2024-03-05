@@ -1,5 +1,5 @@
 import "package:dio/dio.dart";
-import "package:flutter/material.dart";
+import "package:food_delivery/components/snackbars.dart";
 import "package:food_delivery/main.dart";
 import "package:food_delivery/services/storage_service.dart";
 
@@ -43,19 +43,7 @@ class TokenInterceptor extends Interceptor {
         );
 
         snackbarKey.currentState?.showSnackBar(
-          SnackBar(
-            content: const Text("Session expired."),
-            backgroundColor: const Color.fromARGB(255, 255, 130, 2),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: "Dismiss",
-              onPressed: () {
-                snackbarKey.currentState?.hideCurrentSnackBar();
-              },
-              textColor: Colors.white,
-            ),
-          ),
+          showInvalidSnackbar("Session expired"),
         );
       }
     }

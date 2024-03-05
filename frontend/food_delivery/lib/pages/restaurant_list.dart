@@ -5,6 +5,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dio/dio.dart';
 import 'package:food_delivery/components/bottom_navigation_bar.dart';
+import 'package:food_delivery/components/snackbars.dart';
 import 'package:food_delivery/main.dart';
 import 'package:food_delivery/models/restaurants_model.dart';
 import 'package:food_delivery/network/dio_client.dart';
@@ -193,19 +194,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     } on DioException catch (_) {
       if (!mounted) return;
       snackbarKey.currentState?.showSnackBar(
-        SnackBar(
-          content: const Text("Unknown error"),
-          backgroundColor: const Color.fromARGB(255, 255, 130, 2),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 5),
-          action: SnackBarAction(
-            label: "Dismiss",
-            onPressed: () {
-              snackbarKey.currentState?.hideCurrentSnackBar();
-            },
-            textColor: Colors.white,
-          ),
-        ),
+        showInvalidSnackbar("Unknown error"),
       );
     }
   }
