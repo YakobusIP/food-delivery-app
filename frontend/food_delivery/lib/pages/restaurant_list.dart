@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dio/dio.dart';
+import 'package:food_delivery/components/bottom_navigation_bar.dart';
 import 'package:food_delivery/main.dart';
 import 'package:food_delivery/models/restaurants_model.dart';
 import 'package:food_delivery/network/dio_client.dart';
@@ -288,37 +289,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               ),
             ),
           ),
-          _bottomNavigationBar()
         ],
       ),
-    );
-  }
-
-  BottomNavigationBar _bottomNavigationBar() {
-    return BottomNavigationBar(
-      items: [
-        BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/restaurant.svg",
-              width: 30,
-              height: 30,
-            ),
-            label: "Restaurants"),
-        BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/history.svg",
-              width: 30,
-              height: 30,
-            ),
-            label: "Order History"),
-        BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/account_circle.svg",
-              width: 30,
-              height: 30,
-            ),
-            label: "Account"),
-      ],
+      bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
     );
   }
 
