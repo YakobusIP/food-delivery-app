@@ -31,6 +31,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final List<Restaurant> _restaurants = [];
   bool _isLoading = false;
   int _currentPage = 1;
+  int _totalPage = 1;
 
   final ScrollController _scrollController = ScrollController();
 
@@ -166,7 +167,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   }
 
   Future<void> _getRestaurants() async {
-    if (_isLoading) return;
+    if (_isLoading || _currentPage > _totalPage) return;
 
     setState(() {
       _isLoading = true;
@@ -183,11 +184,13 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
       });
 
       var data = response.data["data"] as List;
+      var totalPage = response.data["total_pages"] as int;
       if (mounted) {
         setState(() {
           _restaurants
               .addAll(data.map((json) => Restaurant.fromJson(json)).toList());
           _currentPage++;
+          _totalPage = totalPage;
           _isLoading = false;
         });
       }

@@ -26,6 +26,7 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
   final List<Menu> _menus = [];
   bool _isLoading = false;
   int _currentPage = 1;
+  int _totalPage = 1;
 
   final ScrollController _scrollController = ScrollController();
 
@@ -50,7 +51,7 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
   }
 
   Future<void> _getRestaurantMenus() async {
-    if (_isLoading) return;
+    if (_isLoading || _currentPage > _totalPage) return;
 
     setState(() {
       _isLoading = true;
@@ -67,10 +68,12 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
       );
 
       var data = response.data["data"] as List;
+      var totalPage = response.data["total_pages"] as int;
       if (mounted) {
         setState(() {
           _menus.addAll(data.map((json) => Menu.fromJson(json)).toList());
           _currentPage++;
+          _totalPage = totalPage;
           _isLoading = false;
         });
       }
@@ -105,6 +108,19 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
       _getRestaurantDetail();
       _getRestaurantMenus();
     });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _getRestaurantMenus();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -117,80 +133,76 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
         appBar: CustomMenuAppBar(),
         body: Column(
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.bottomCenter,
-              children: [
-                SizedBox(
-                  height: 250,
-                  width: double.infinity,
-                  child: Image.network(
-                    _restaurantDetail!.imagePath,
-                    fit: BoxFit.cover,
+            SizedBox(
+              height: 200,
+              width: double.infinity,
+              child: Image.network(
+                _restaurantDetail!.imagePath,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Container(
+              transform: Matrix4.translationValues(0, -25, 0),
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 6,
+                    offset: Offset(0, 2),
                   ),
-                ),
-                Positioned(
-                  bottom: -225,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 6,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _restaurantDetail!.name,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 30),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _restaurantDetail!.name,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 30),
-                          ),
-                          _ratingAndOpenHours(),
-                          const Divider(),
-                          const Text(
-                            "Address",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            _restaurantDetail!.address,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const Divider(),
-                          const Text(
-                            "Contact details",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            _restaurantDetail!.email,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          Text(
-                            _restaurantDetail!.phoneNumber,
-                            style: const TextStyle(fontSize: 16),
-                          )
-                        ],
+                    _ratingAndOpenHours(),
+                    const Divider(),
+                    const Text(
+                      "Address",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ),
-                )
-              ],
+                    Text(
+                      _restaurantDetail!.address,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const Divider(),
+                    const Text(
+                      "Contact details",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      _restaurantDetail!.email,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      _restaurantDetail!.phoneNumber,
+                      style: const TextStyle(fontSize: 16),
+                    )
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 200),
+            const Text(
+              "Menu",
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 30),
+            ),
             Expanded(
               child: GridView.builder(
+                padding: const EdgeInsets.only(top: 4),
                 controller: _scrollController,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -268,7 +280,7 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
     return GestureDetector(
       onTap: () {},
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             ClipRRect(
@@ -280,10 +292,11 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
               menu.name,
               style: const TextStyle(fontWeight: FontWeight.w700),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
             Text(
               _formatCurrency(menu.price),
