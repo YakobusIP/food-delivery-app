@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:food_delivery/arguments/menu_detail_arguments.dart';
 import 'package:food_delivery/components/bottom_navigation_bar.dart';
 import 'package:food_delivery/components/custom_menu_app_bar.dart';
@@ -164,7 +162,9 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
                     Text(
                       _restaurantDetail!.name,
                       style: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 30),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 30,
+                      ),
                     ),
                     _ratingAndOpenHours(),
                     const Divider(),
@@ -255,10 +255,10 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
         const SizedBox(width: 10),
         Row(
           children: [
-            SvgPicture.asset(
-              "assets/icons/clock.svg",
-              width: 18,
-              height: 18,
+            const Icon(
+              Icons.schedule_outlined,
+              color: Colors.black,
+              size: 20,
             ),
             const SizedBox(width: 5),
             Text(

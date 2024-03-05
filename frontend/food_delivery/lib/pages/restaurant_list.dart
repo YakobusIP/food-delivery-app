@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dio/dio.dart';
 import 'package:food_delivery/components/bottom_navigation_bar.dart';
 import 'package:food_delivery/components/snackbars.dart';
@@ -318,10 +317,10 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                   ),
                   Row(
                     children: [
-                      SvgPicture.asset(
-                        "assets/icons/clock.svg",
-                        width: 18,
-                        height: 18,
+                      const Icon(
+                        Icons.schedule_outlined,
+                        color: Colors.black,
+                        size: 20,
                       ),
                       const SizedBox(width: 5),
                       Text(
@@ -363,10 +362,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   TextButton _filterAndSort() {
     return TextButton.icon(
       onPressed: _showFilterBottomSheet,
-      icon: SvgPicture.asset(
-        "assets/icons/filter.svg",
-        width: 25,
-        height: 25,
+      icon: const Icon(
+        Icons.filter_alt_outlined,
+        color: Colors.black,
       ),
       label: const Text(
         "Filter & sort",
@@ -386,13 +384,12 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     return TextField(
       controller: _searchController,
       decoration: InputDecoration(
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(10),
-          child: SvgPicture.asset(
-            width: 10,
-            height: 10,
-            "assets/icons/search.svg",
-            fit: BoxFit.scaleDown,
+        prefixIcon: const Padding(
+          padding: EdgeInsets.all(10),
+          child: Icon(
+            Icons.search,
+            color: Colors.black,
+            size: 30,
           ),
         ),
         suffixIcon: _searchController.text.isNotEmpty

@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
           );
 
           Navigator.of(context).pushNamedAndRemoveUntil(
-            "/restaurant-list",
+            "restaurant-list",
             (_) => false,
           );
         }
