@@ -1,4 +1,4 @@
-class Restaurants {
+class Restaurant {
   final int id;
   final String name;
   final String address;
@@ -10,7 +10,7 @@ class Restaurants {
   final String closingTime;
   final String imagePath;
 
-  Restaurants({
+  Restaurant({
     required this.id,
     required this.name,
     required this.address,
@@ -23,8 +23,8 @@ class Restaurants {
     required this.imagePath,
   });
 
-  factory Restaurants.fromJson(Map<String, dynamic> json) {
-    return Restaurants(
+  factory Restaurant.fromJson(Map<String, dynamic> json) {
+    return Restaurant(
         id: json['id'],
         name: json['name'],
         address: json['address'],

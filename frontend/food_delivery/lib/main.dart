@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:food_delivery/pages/login.dart';
 import 'package:food_delivery/pages/register.dart';
 import 'package:food_delivery/pages/restaurant_list.dart';
+import 'package:food_delivery/pages/restaurant_menus.dart';
 import 'package:food_delivery/pages/welcome.dart';
 import 'package:food_delivery/services/storage_service.dart';
 
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         "register": (context) => const RegisterPage(),
         "login": (context) => const LoginPage(),
         "restaurant-list": (context) => const RestaurantListPage(),
+        "restaurant-menus": (context) => const RestaurantMenus(),
       },
     );
   }

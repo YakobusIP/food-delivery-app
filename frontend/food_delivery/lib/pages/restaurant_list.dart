@@ -7,7 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:food_delivery/components/bottom_navigation_bar.dart';
 import 'package:food_delivery/components/snackbars.dart';
 import 'package:food_delivery/main.dart';
-import 'package:food_delivery/models/restaurants_model.dart';
+import 'package:food_delivery/models/restaurant_model.dart';
 import 'package:food_delivery/network/dio_client.dart';
 import 'package:intl/intl.dart';
 
@@ -28,7 +28,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final List<String> _sortOptions = ["name", "-name", "rating", "-rating"];
   String _sortedBy = "name";
 
-  final List<Restaurants> _restaurants = [];
+  final List<Restaurant> _restaurants = [];
   bool _isLoading = false;
   int _currentPage = 1;
 
@@ -186,7 +186,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
       if (mounted) {
         setState(() {
           _restaurants
-              .addAll(data.map((json) => Restaurants.fromJson(json)).toList());
+              .addAll(data.map((json) => Restaurant.fromJson(json)).toList());
           _currentPage++;
           _isLoading = false;
         });
@@ -286,65 +286,73 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
 
   Center _loadingProgress() => const Center(child: CircularProgressIndicator());
 
-  Container _activeListView(Restaurants restaurant) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        children: [
-          Image.network(
-            restaurant.imagePath,
-            width: 100,
-            height: 100,
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  restaurant.name,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w700, fontSize: 18),
-                ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      "assets/icons/clock.svg",
-                      width: 18,
-                      height: 18,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      "${_formatTime(restaurant.openingTime)} - ${_formatTime(restaurant.closingTime)}",
-                      style: const TextStyle(fontSize: 16),
-                    )
-                  ],
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    RatingBarIndicator(
-                      itemBuilder: (BuildContext context, int index) =>
-                          const Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                      rating: restaurant.rating,
-                      itemCount: 5,
-                      direction: Axis.horizontal,
-                      itemSize: 20,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      restaurant.rating.toString(),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
-                )
-              ],
+  GestureDetector _activeListView(Restaurant restaurant) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          "restaurant-menus",
+          arguments: restaurant.id,
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        child: Row(
+          children: [
+            Image.network(
+              restaurant.imagePath,
+              width: 100,
+              height: 100,
             ),
-          )
-        ],
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    restaurant.name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 18),
+                  ),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        "assets/icons/clock.svg",
+                        width: 18,
+                        height: 18,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        "${_formatTime(restaurant.openingTime)} - ${_formatTime(restaurant.closingTime)}",
+                        style: const TextStyle(fontSize: 16),
+                      )
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      RatingBarIndicator(
+                        itemBuilder: (BuildContext context, int index) =>
+                            const Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        ),
+                        rating: restaurant.rating,
+                        itemCount: 5,
+                        direction: Axis.horizontal,
+                        itemSize: 20,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        restaurant.rating.toString(),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
