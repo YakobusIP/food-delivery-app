@@ -16,7 +16,7 @@ void main() async {
 
   String? accessToken = await storageService.get("accessToken");
 
-  String initialRoute = accessToken == null ? "/" : "/restaurant-list";
+  String initialRoute = accessToken == null ? "" : "restaurant-list";
 
   runApp(MyApp(initialRoute: initialRoute));
 }
@@ -36,10 +36,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(fontFamily: "Poppins"),
       initialRoute: initialRoute,
       routes: {
-        "/": (context) => WelcomePage(),
-        "/register": (context) => const RegisterPage(),
-        "/login": (context) => const LoginPage(),
-        "/restaurant-list": (context) => const RestaurantListPage(),
+        "": (context) => WelcomePage(),
+        "register": (context) => const RegisterPage(),
+        "login": (context) => const LoginPage(),
+        "restaurant-list": (context) => const RestaurantListPage(),
       },
     );
   }
