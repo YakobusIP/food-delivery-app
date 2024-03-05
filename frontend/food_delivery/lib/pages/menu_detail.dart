@@ -21,6 +21,8 @@ class _MenuDetailState extends State<MenuDetail> {
   late int _menuId;
   Menu? _menuDetail;
 
+  int _quantity = 1;
+
   Future<void> _getMenuDetail() async {
     var dioClient = DioClient();
 
@@ -34,6 +36,30 @@ class _MenuDetailState extends State<MenuDetail> {
           _menuDetail = Menu.fromJson(data);
         });
       }
+    } on DioException catch (_) {
+      if (!mounted) return;
+      snackbarKey.currentState?.showSnackBar(
+        showInvalidSnackbar("Unknown error"),
+      );
+    }
+  }
+
+  Future<void> _addToCart() async {
+    var dioClient = DioClient();
+
+    try {
+      var response = await dioClient.dio.post("/orders/customers", data: {
+        "restaurant_id": _restaurantId,
+        "menu_id": _menuId,
+        "quantity": _quantity
+      });
+
+      if (!mounted) return;
+      snackbarKey.currentState?.showSnackBar(
+        showValidSnackbar(response.data["message"] as String),
+      );
+
+      Navigator.of(context).pop();
     } on DioException catch (_) {
       if (!mounted) return;
       snackbarKey.currentState?.showSnackBar(
@@ -106,6 +132,68 @@ class _MenuDetailState extends State<MenuDetail> {
                       const Divider(),
                       const SizedBox(height: 10),
                       _priceTag(),
+                      const SizedBox(height: 100),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (_quantity > 1) {
+                                  _quantity--;
+                                }
+                              });
+                            },
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 4, 202, 138),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Container(
+                                width: 48,
+                                height: 48,
+                                alignment: Alignment.center,
+                                child: const Icon(
+                                  Icons.remove,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Text(
+                            _quantity.toString(),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _quantity++;
+                              });
+                            },
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 4, 202, 138),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Container(
+                                width: 48,
+                                height: 48,
+                                alignment: Alignment.center,
+                                child: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -145,16 +233,16 @@ class _MenuDetailState extends State<MenuDetail> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       child: TextButton(
-        onPressed: () {},
+        onPressed: _addToCart,
         style: TextButton.styleFrom(
             minimumSize: const Size.fromHeight(50),
             backgroundColor: const Color.fromARGB(255, 4, 202, 138),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10))),
-        child: const Text(
-          "Add to cart",
-          style: TextStyle(
-              color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+        child: Text(
+          "Add to cart - ${_formatCurrency(_menuDetail!.price * _quantity)}",
+          style: const TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
         ),
       ),
     );
