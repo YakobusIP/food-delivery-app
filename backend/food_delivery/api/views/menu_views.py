@@ -4,6 +4,7 @@ from rest_framework import status
 from ..models import Restaurant, Menu
 from ..serializers.menu_serializers import MenuSerializer
 from ..permissions import IsAuthenticated, IsAuthenticatedRestaurantRole
+from ..pagination import CustomPagination
 from django.shortcuts import get_object_or_404
 
 class MenuAPIView(APIView):
@@ -12,8 +13,15 @@ class MenuAPIView(APIView):
         return [permission() for permission in permission_classes]
     
     def get(self, request, restaurant_id):
-        menus = Menu.objects.filter(restaurant_id=restaurant_id)
-        serializer = MenuSerializer(menus, many=True)
+        queryset = Menu.objects.filter(restaurant_id=restaurant_id)
+        paginator = CustomPagination()
+        page = paginator.paginate_queryset(queryset, request)
+
+        if page is not None:
+            serializer = MenuSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        
+        serializer = MenuSerializer(queryset, many=True)
         return Response({ "data": serializer.data })
     
     def post(self, request, restaurant_id):
@@ -31,6 +39,7 @@ class MenuAPIView(APIView):
         return Response({ "errors": serializer.errors }, status=status.HTTP_400_BAD_REQUEST)
     
 class MenuListAPIView(APIView):
+
     def get_permissions(self):
         permission_classes = [IsAuthenticatedRestaurantRole] if self.request.method in ["PUT", "DELETE"] else [IsAuthenticated]
         return [permission() for permission in permission_classes]
