@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:food_delivery/arguments/menu_detail_arguments.dart';
 import 'package:food_delivery/components/bottom_navigation_bar.dart';
 import 'package:food_delivery/components/custom_menu_app_bar.dart';
 import 'package:food_delivery/components/snackbars.dart';
@@ -169,9 +170,7 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
                     const Divider(),
                     const Text(
                       "Address",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                     Text(
                       _restaurantDetail!.address,
@@ -180,9 +179,7 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
                     const Divider(),
                     const Text(
                       "Contact details",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                     Text(
                       _restaurantDetail!.email,
@@ -278,7 +275,12 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
 
   GestureDetector _activeListView(Menu menu) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          "menu-detail",
+          arguments: MenuDetailArguments(_restaurantId, menu.id),
+        );
+      },
       child: Container(
         padding: const EdgeInsets.all(16),
         child: Column(

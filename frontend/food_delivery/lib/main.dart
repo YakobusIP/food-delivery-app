@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:food_delivery/pages/login.dart';
+import 'package:food_delivery/pages/menu_detail.dart';
 import 'package:food_delivery/pages/register.dart';
 import 'package:food_delivery/pages/restaurant_list.dart';
 import 'package:food_delivery/pages/restaurant_menus.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         "login": (context) => const LoginPage(),
         "restaurant-list": (context) => const RestaurantListPage(),
         "restaurant-menus": (context) => const RestaurantMenus(),
+        "menu-detail": (context) => const MenuDetail(),
       },
     );
   }
