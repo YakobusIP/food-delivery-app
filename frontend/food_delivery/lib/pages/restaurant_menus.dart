@@ -197,9 +197,10 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
               "Menu",
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 30),
             ),
+            const SizedBox(height: 20),
             Expanded(
               child: GridView.builder(
-                padding: const EdgeInsets.only(top: 4),
+                padding: const EdgeInsets.only(top: 0),
                 controller: _scrollController,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -294,11 +295,14 @@ class _RestaurantMenusState extends State<RestaurantMenus> {
                 fit: BoxFit.cover,
               ),
             ),
-            Text(
-              menu.name,
-              style: const TextStyle(fontWeight: FontWeight.w700),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                menu.name,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
             Text(
               _formatCurrency(menu.price),
