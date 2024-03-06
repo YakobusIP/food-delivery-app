@@ -15,14 +15,14 @@ class StatusOptions {
   StatusOptions({required this.text, required this.value});
 }
 
-class OrderHistory extends StatefulWidget {
-  const OrderHistory({super.key});
+class OrderHistoryPage extends StatefulWidget {
+  const OrderHistoryPage({super.key});
 
   @override
-  State<OrderHistory> createState() => _OrderHistoryState();
+  State<OrderHistoryPage> createState() => _OrderHistoryState();
 }
 
-class _OrderHistoryState extends State<OrderHistory> {
+class _OrderHistoryState extends State<OrderHistoryPage> {
   bool _isLoading = false;
 
   final List<StatusOptions> _statusOptions = [

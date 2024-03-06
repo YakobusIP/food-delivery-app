@@ -43,9 +43,9 @@ class MyApp extends StatelessWidget {
         "register": (context) => const RegisterPage(),
         "login": (context) => const LoginPage(),
         "restaurant-list": (context) => const RestaurantListPage(),
-        "restaurant-menus": (context) => const RestaurantMenus(),
-        "menu-detail": (context) => const MenuDetail(),
-        "order-history": (context) => const OrderHistory(),
+        "restaurant-menus": (context) => const RestaurantMenusPage(),
+        "menu-detail": (context) => const MenuDetailPage(),
+        "order-history": (context) => const OrderHistoryPage(),
       },
     );
   }

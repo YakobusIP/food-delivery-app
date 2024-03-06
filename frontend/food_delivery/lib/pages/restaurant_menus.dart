@@ -11,14 +11,14 @@ import 'package:food_delivery/models/restaurant_model.dart';
 import 'package:food_delivery/network/dio_client.dart';
 import 'package:intl/intl.dart';
 
-class RestaurantMenus extends StatefulWidget {
-  const RestaurantMenus({super.key});
+class RestaurantMenusPage extends StatefulWidget {
+  const RestaurantMenusPage({super.key});
 
   @override
-  State<RestaurantMenus> createState() => _RestaurantMenusState();
+  State<RestaurantMenusPage> createState() => _RestaurantMenusState();
 }
 
-class _RestaurantMenusState extends State<RestaurantMenus> {
+class _RestaurantMenusState extends State<RestaurantMenusPage> {
   late int _restaurantId;
   Restaurant? _restaurantDetail;
 
