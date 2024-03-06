@@ -48,7 +48,7 @@ class _MenuDetailState extends State<MenuDetail> {
     var dioClient = DioClient();
 
     try {
-      var response = await dioClient.dio.post("/orders/customers", data: {
+      var response = await dioClient.dio.post("/customers/orders", data: {
         "restaurant_id": _restaurantId,
         "menu_id": _menuId,
         "quantity": _quantity

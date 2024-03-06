@@ -38,7 +38,7 @@ class TokenInterceptor extends Interceptor {
         _storageService.delete("refreshtoken");
 
         navigatorKey.currentState?.pushNamedAndRemoveUntil(
-          "/login",
+          "login",
           (_) => false,
         );
 
