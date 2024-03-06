@@ -18,7 +18,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
           case 1:
             Navigator.of(context).pushNamed("order-history");
           default:
-            Navigator.of(context).pushNamed("restaurant-list");
+            Navigator.of(context).pushNamed("account");
         }
       },
       items: [

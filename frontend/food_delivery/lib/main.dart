@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:food_delivery/pages/account.dart';
 import 'package:food_delivery/pages/login.dart';
 import 'package:food_delivery/pages/menu_detail.dart';
 import 'package:food_delivery/pages/order_history.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         "restaurant-menus": (context) => const RestaurantMenusPage(),
         "menu-detail": (context) => const MenuDetailPage(),
         "order-history": (context) => const OrderHistoryPage(),
+        "account": (context) => const AccountPage()
       },
     );
   }
